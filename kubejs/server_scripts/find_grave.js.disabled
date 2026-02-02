@@ -1,0 +1,214 @@
+// 寻找玩家墓碑的脚本
+// 用途：查找指定玩家的墓碑位置并传送
+
+// 注册命令
+ServerEvents.commandRegistry(event => {
+    const { commands: Commands, arguments: Arguments } = event
+    
+    // 注册 scangrave 命令
+    event.register(
+        Commands.literal('scangrave')
+            .requires(source => source.hasPermission(2))
+            .executes(ctx => {
+                return scanGravesCommand(ctx, 50)
+            })
+            .then(
+                Commands.argument('radius', Arguments.INTEGER.create(event))
+                    .executes(ctx => {
+                        const radius = Arguments.INTEGER.getResult(ctx, 'radius')
+                        return scanGravesCommand(ctx, radius)
+                    })
+            )
+    )
+    
+    // 注册 findgrave 命令
+    event.register(
+        Commands.literal('findgrave')
+            .requires(source => source.hasPermission(2))
+            .then(
+                Commands.argument('player', Arguments.STRING.create(event))
+                    .executes(ctx => {
+                        const targetPlayerName = Arguments.STRING.getResult(ctx, 'player')
+                        return findGraveCommand(ctx, targetPlayerName)
+                    })
+            )
+    )
+    
+    // 注册 listentities 调试命令
+    event.register(
+        Commands.literal('listentities')
+            .requires(source => source.hasPermission(2))
+            .executes(ctx => {
+                return listEntitiesCommand(ctx, 50)
+            })
+            .then(
+                Commands.argument('radius', Arguments.INTEGER.create(event))
+                    .executes(ctx => {
+                        const radius = Arguments.INTEGER.getResult(ctx, 'radius')
+                        return listEntitiesCommand(ctx, radius)
+                    })
+            )
+    )
+})
+
+// 扫描墓碑实体的函数（Corail Tombstone 使用实体而非方块）
+function scanGravesCommand(ctx, radius) {
+    const source = ctx.source
+    const player = source.player
+    const level = player.level
+    const playerPos = player.position
+    
+    player.tell('§e正在扫描半径 ' + radius + ' 格内的墓碑实体...')
+    
+    let foundGraves = []
+    
+    // 遍历所有实体，查找墓碑
+    level.entities.forEach(entity => {
+        const entityType = entity.type.toString()
+        const pos = entity.position
+        
+        // 计算距离
+        const dx = pos.x - playerPos.x
+        const dy = pos.y - playerPos.y
+        const dz = pos.z - playerPos.z
+        const distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+        
+        // 检查是否在范围内且是墓碑实体
+        if (distance <= radius && (entityType.includes('tombstone') || entityType.includes('grave'))) {
+            foundGraves.push({
+                x: Math.floor(pos.x),
+                y: Math.floor(pos.y),
+                z: Math.floor(pos.z),
+                type: entityType,
+                distance: Math.floor(distance)
+            })
+        }
+    })
+    
+    if (foundGraves.length === 0) {
+        player.tell('§c在半径 ' + radius + ' 格内未找到墓碑实体！')
+        player.tell('§c提示：Corail Tombstone 的墓碑是实体，不是方块')
+        player.tell('§c尝试增大搜索半径: /scangrave <半径>')
+        return 0
+    }
+    
+    // 按距离排序
+    foundGraves.sort(function(a, b) { return a.distance - b.distance })
+    
+    player.tell('§a找到 ' + foundGraves.length + ' 个墓碑实体：')
+    
+    for (let i = 0; i < foundGraves.length && i < 10; i++) {
+        const grave = foundGraves[i]
+        player.tell('§e' + (i + 1) + '. §7' + grave.type)
+        player.tell('  §b坐标: (' + grave.x + ', ' + grave.y + ', ' + grave.z + ') §7距离: ' + grave.distance + '格')
+        player.tell(Text.of('  §a[传送]')
+            .click('/tp @s ' + grave.x + ' ' + grave.y + ' ' + grave.z)
+            .hover('§7点击传送到此墓碑'))
+    }
+    
+    if (foundGraves.length > 10) {
+        player.tell('§e... 还有 ' + (foundGraves.length - 10) + ' 个墓碑未显示')
+    }
+    
+    return 1
+}
+
+// 查找玩家墓碑的函数
+function findGraveCommand(ctx, targetPlayerName) {
+    const source = ctx.source
+    const player = source.player
+    const level = player.level
+    
+    player.tell('§e正在搜索 ' + targetPlayerName + ' 的墓碑...')
+    
+    let foundGraves = []
+    
+    level.entities.forEach(entity => {
+        const entityType = entity.type.toString()
+        
+        if (entityType.includes('tombstone') || entityType.includes('grave')) {
+            const nbt = entity.fullNBT
+            
+            if (nbt && nbt.toString().includes(targetPlayerName)) {
+                const pos = entity.position
+                foundGraves.push({
+                    x: Math.floor(pos.x),
+                    y: Math.floor(pos.y),
+                    z: Math.floor(pos.z)
+                })
+            }
+        }
+    })
+    
+    if (foundGraves.length === 0) {
+        player.tell('§c未找到 ' + targetPlayerName + ' 的墓碑！')
+        player.tell('§c提示：墓碑可能在未加载的区块中')
+        return 0
+    }
+    
+    player.tell('§a找到 ' + foundGraves.length + ' 个墓碑：')
+    
+    for (let i = 0; i < foundGraves.length; i++) {
+        const grave = foundGraves[i]
+        player.tell('§e' + (i + 1) + '. 坐标: §b' + grave.x + ', ' + grave.y + ', ' + grave.z)
+        player.tell(Text.of('  §a[点击传送]')
+            .click('/tp @s ' + grave.x + ' ' + grave.y + ' ' + grave.z)
+            .hover('§7点击传送到此墓碑'))
+    }
+    
+    return 1
+}
+
+// 列出附近所有实体的调试命令
+function listEntitiesCommand(ctx, radius) {
+    const source = ctx.source
+    const player = source.player
+    const level = player.level
+    const playerPos = player.position
+    
+    player.tell('§e正在列出半径 ' + radius + ' 格内的所有实体...')
+    
+    let entityMap = {}
+    let totalCount = 0
+    
+    level.entities.forEach(entity => {
+        const pos = entity.position
+        const dx = pos.x - playerPos.x
+        const dy = pos.y - playerPos.y
+        const dz = pos.z - playerPos.z
+        const distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+        
+        if (distance <= radius) {
+            const entityType = entity.type.toString()
+            if (!entityMap[entityType]) {
+                entityMap[entityType] = 0
+            }
+            entityMap[entityType]++
+            totalCount++
+        }
+    })
+    
+    player.tell('§a找到 ' + totalCount + ' 个实体，共 ' + Object.keys(entityMap).length + ' 种类型：')
+    
+    let sortedEntities = []
+    for (let type in entityMap) {
+        sortedEntities.push({ type: type, count: entityMap[type] })
+    }
+    sortedEntities.sort(function(a, b) { return b.count - a.count })
+    
+    for (let i = 0; i < sortedEntities.length && i < 20; i++) {
+        const entry = sortedEntities[i]
+        player.tell('§e' + (i + 1) + '. §7' + entry.type + ' §bx' + entry.count)
+    }
+    
+    if (sortedEntities.length > 20) {
+        player.tell('§e... 还有 ' + (sortedEntities.length - 20) + ' 种实体类型未显示')
+    }
+    
+    return 1
+}
+
+console.info('[墓碑查找器] 已加载！')
+console.info('[墓碑查找器] /scangrave [半径] - 搜索附近的墓碑实体')
+console.info('[墓碑查找器] /findgrave <玩家名> - 搜索指定玩家的墓碑')
+console.info('[墓碑查找器] /listentities [半径] - 列出附近所有实体类型（调试用）')
