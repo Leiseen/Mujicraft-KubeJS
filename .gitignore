@@ -4,8 +4,9 @@
 # 不忽略目录
 !*/
 
-# 仅追踪 kubejs 文件夹下的内容
+# 仅追踪指定文件夹下的内容
 !kubejs/**
+!commands/**
 
 # 追踪 .gitignore 文件本身
 !.gitignore
