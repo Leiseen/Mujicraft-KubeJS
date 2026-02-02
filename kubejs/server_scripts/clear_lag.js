@@ -276,196 +276,201 @@ function isOperator(player) {
 
 // ================= 自定义命令：生成清理日志 =================
 
+// 注意：KubeJS 6 中 ServerEvents.customCommand 的正确语法
+// 使用单一回调函数，通过 event.id 判断命令类型
 ServerEvents.customCommand(event => {
-    if (event.id === 'generate_clear_log') {
-        let player = event.player;
+    // 检查命令 ID
+    if (event.id !== 'generate_clear_log') {
+        return
+    }
+    
+    let player = event.player
+    
+    // 权限检查
+    if (!isOperator(player)) {
+        player.tell(Text.red("[权限不足] 只有 OP 可以生成清理日志"))
+        return
+    }
+    
+    try {
+        let data = event.server.persistentData
         
-        // 权限检查
-        if (!isOperator(player)) {
-            player.tell(Text.red("[权限不足] 只有 OP 可以生成清理日志"));
-            return;
+        if (!data.contains('lastClearData')) {
+            player.tell(Text.red("[错误] 没有可用的清理数据"))
+            return
         }
         
+        let clearData = JSON.parse(data.getString('lastClearData'))
+        
+        // 检查是否已经生成过日志
+        if (data.contains('lastGeneratedLogTimestamp')) {
+            let lastGenerated = data.getLong('lastGeneratedLogTimestamp')
+            if (lastGenerated === clearData.timestamp) {
+                player.tell(Text.yellow("[提示] 该次清理的日志已经生成过了！"))
+                player.tell(Text.gray("  请勿重复操作"))
+                
+                // 显示已生成的文件名
+                if (data.contains('lastGeneratedLogFilename')) {
+                    let lastFilename = data.getString('lastGeneratedLogFilename')
+                    player.tell(Text.aqua(`  文件: ${LOG_DIR}/${lastFilename}`))
+                }
+                return
+            }
+        }
+        
+        let timestamp = new Date(clearData.timestamp)
+        let filename = `clear_log_${timestamp.getFullYear()}-${String(timestamp.getMonth()+1).padStart(2,'0')}-${String(timestamp.getDate()).padStart(2,'0')}_${String(timestamp.getHours()).padStart(2,'0')}-${String(timestamp.getMinutes()).padStart(2,'0')}-${String(timestamp.getSeconds()).padStart(2,'0')}.txt`
+        
+        // 构建日志内容
+        let logContent = []
+        logContent.push("=".repeat(60))
+        logContent.push(`${SCRIPT_NAME} - 清理日志`)
+        logContent.push(`版本: ${SCRIPT_VERSION}`)
+        logContent.push(`时间: ${timestamp.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}`)
+        logContent.push(`操作者: ${player.username}`)
+        logContent.push("=".repeat(60))
+        logContent.push("")
+        logContent.push(`清理统计:`)
+        logContent.push(`  - 掉落物: ${clearData.itemCount} 个`)
+        logContent.push(`  - 经验球: ${clearData.orbCount} 个`)
+        logContent.push("")
+        logContent.push("=".repeat(60))
+        logContent.push("清理物品详情:")
+        logContent.push("=".repeat(60))
+        logContent.push("")
+        
+        // 统计物品种类和数量
+        let itemStats = {}
+        clearData.items.forEach(item => {
+            let key = item.id
+            if (!itemStats[key]) {
+                itemStats[key] = {
+                    displayName: item.displayName,
+                    totalCount: 0,
+                    locations: []
+                }
+            }
+            itemStats[key].totalCount += item.count
+            itemStats[key].locations.push({
+                count: item.count,
+                dimension: item.dimension,
+                pos: item.pos
+            })
+        })
+        
+        // 按总数量排序
+        let sortedItems = Object.entries(itemStats).sort((a, b) => b[1].totalCount - a[1].totalCount)
+        
+        logContent.push("【物品统计】")
+        logContent.push("")
+        sortedItems.forEach(([id, stats], index) => {
+            logContent.push(`${index + 1}. ${stats.displayName} (${id})`)
+            logContent.push(`   总数量: ${stats.totalCount}`)
+            logContent.push(`   清理位置 (${stats.locations.length} 处):`)
+            stats.locations.forEach((loc, i) => {
+                logContent.push(`     ${i + 1}) ${loc.dimension} @ ${loc.pos} - 数量: ${loc.count}`)
+            })
+            logContent.push("")
+        })
+        
+        logContent.push("=".repeat(60))
+        logContent.push("日志结束")
+        logContent.push("=".repeat(60))
+        
+        // 写入文件
         try {
-            let data = event.server.persistentData;
-            
-            if (!data.contains('lastClearData')) {
-                player.tell(Text.red("[错误] 没有可用的清理数据"));
-                return;
-            }
-            
-            let clearData = JSON.parse(data.getString('lastClearData'));
-            
-            // 检查是否已经生成过日志
-            if (data.contains('lastGeneratedLogTimestamp')) {
-                let lastGenerated = data.getLong('lastGeneratedLogTimestamp');
-                if (lastGenerated === clearData.timestamp) {
-                    player.tell(Text.yellow("[提示] 该次清理的日志已经生成过了！"));
-                    player.tell(Text.gray("  请勿重复操作"));
-                    
-                    // 显示已生成的文件名
-                    if (data.contains('lastGeneratedLogFilename')) {
-                        let lastFilename = data.getString('lastGeneratedLogFilename');
-                        player.tell(Text.aqua(`  文件: ${LOG_DIR}/${lastFilename}`));
-                    }
-                    return;
-                }
-            }
-            
-            let timestamp = new Date(clearData.timestamp);
-            let filename = `clear_log_${timestamp.getFullYear()}-${String(timestamp.getMonth()+1).padStart(2,'0')}-${String(timestamp.getDate()).padStart(2,'0')}_${String(timestamp.getHours()).padStart(2,'0')}-${String(timestamp.getMinutes()).padStart(2,'0')}-${String(timestamp.getSeconds()).padStart(2,'0')}.txt`;
-            
-            // 构建日志内容
-            let logContent = [];
-            logContent.push("=".repeat(60));
-            logContent.push(`${SCRIPT_NAME} - 清理日志`);
-            logContent.push(`版本: ${SCRIPT_VERSION}`);
-            logContent.push(`时间: ${timestamp.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}`);
-            logContent.push(`操作者: ${player.username}`);
-            logContent.push("=".repeat(60));
-            logContent.push("");
-            logContent.push(`清理统计:`);
-            logContent.push(`  - 掉落物: ${clearData.itemCount} 个`);
-            logContent.push(`  - 经验球: ${clearData.orbCount} 个`);
-            logContent.push("");
-            logContent.push("=".repeat(60));
-            logContent.push("清理物品详情:");
-            logContent.push("=".repeat(60));
-            logContent.push("");
-            
-            // 统计物品种类和数量
-            let itemStats = {};
-            clearData.items.forEach(item => {
-                let key = item.id;
-                if (!itemStats[key]) {
-                    itemStats[key] = {
-                        displayName: item.displayName,
-                        totalCount: 0,
-                        locations: []
-                    };
-                }
-                itemStats[key].totalCount += item.count;
-                itemStats[key].locations.push({
-                    count: item.count,
-                    dimension: item.dimension,
-                    pos: item.pos
-                });
-            });
-            
-            // 按总数量排序
-            let sortedItems = Object.entries(itemStats).sort((a, b) => b[1].totalCount - a[1].totalCount);
-            
-            logContent.push("【物品统计】");
-            logContent.push("");
-            sortedItems.forEach(([id, stats], index) => {
-                logContent.push(`${index + 1}. ${stats.displayName} (${id})`);
-                logContent.push(`   总数量: ${stats.totalCount}`);
-                logContent.push(`   清理位置 (${stats.locations.length} 处):`);
-                stats.locations.forEach((loc, i) => {
-                    logContent.push(`     ${i + 1}) ${loc.dimension} @ ${loc.pos} - 数量: ${loc.count}`);
-                });
-                logContent.push("");
-            });
-            
-            logContent.push("=".repeat(60));
-            logContent.push("日志结束");
-            logContent.push("=".repeat(60));
-            
-            // 写入文件
+            // KubeJS 6 的类过滤器非常严格，我们使用 JsonIO
             try {
-                // KubeJS 6 的类过滤器非常严格，我们使用 JsonIO
+                // 确保目录存在（使用 JsonIO 的目录创建功能）
+                // 先尝试读取一个不存在的文件来触发目录创建
                 try {
-                    // 确保目录存在（使用 JsonIO 的目录创建功能）
-                    // 先尝试读取一个不存在的文件来触发目录创建
+                    JsonIO.read(`${LOG_DIR}/.dummy`)
+                } catch (e) {
+                    // 目录不存在，创建一个临时文件来创建目录
                     try {
-                        JsonIO.read(`${LOG_DIR}/.dummy`);
-                    } catch (e) {
-                        // 目录不存在，创建一个临时文件来创建目录
-                        try {
-                            JsonIO.write(`${LOG_DIR}/.init`, {created: true});
-                        } catch (e2) {
-                            // 如果还是失败，说明无法创建目录
-                            player.tell(Text.red(`[错误] 无法创建日志目录: ${LOG_DIR}`));
-                            player.tell(Text.yellow(`  请手动创建该目录后重试`));
-                            console.error(`[${SCRIPT_NAME}] 无法创建目录: ${e2}`);
-                            return;
-                        }
+                        JsonIO.write(`${LOG_DIR}/.init`, {created: true})
+                    } catch (e2) {
+                        // 如果还是失败，说明无法创建目录
+                        player.tell(Text.red(`[错误] 无法创建日志目录: ${LOG_DIR}`))
+                        player.tell(Text.yellow(`  请手动创建该目录后重试`))
+                        console.error(`[${SCRIPT_NAME}] 无法创建目录: ${e2}`)
+                        return
                     }
-                    
-                    // 构建 JSON 日志对象
-                    let jsonLog = {
-                        version: SCRIPT_VERSION,
-                        timestamp: clearData.timestamp,
-                        timestampStr: timestamp.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'}),
-                        operator: player.username,
-                        summary: {
-                            itemCount: clearData.itemCount,
-                            orbCount: clearData.orbCount,
-                            itemTypes: sortedItems.length
-                        },
-                        items: sortedItems.map(([id, stats]) => ({
-                            id: id,
-                            displayName: stats.displayName,
-                            totalCount: stats.totalCount,
-                            locationCount: stats.locations.length,
-                            locations: stats.locations
-                        })),
-                        textLog: logContent
-                    };
-                    
-                    // 使用 JsonIO 写入 JSON 文件
-                    let jsonFilename = filename.replace('.txt', '.json');
-                    JsonIO.write(`${LOG_DIR}/${jsonFilename}`, jsonLog);
-                    
-                    // 记录已生成的日志，防止重复生成
-                    data.putLong('lastGeneratedLogTimestamp', clearData.timestamp);
-                    data.putString('lastGeneratedLogFilename', jsonFilename);
-                    
-                    player.tell(Text.green(`[成功] 日志文件已生成！`));
-                    player.tell(Text.gray(`  路径: ${LOG_DIR}/${jsonFilename}`));
-                    player.tell(Text.gray(`  共记录 ${clearData.itemCount} 个物品，${sortedItems.length} 种类型`));
-                    player.tell(Text.yellow(`  提示: JSON 格式，可用文本编辑器查看`));
-                    player.tell(Text.aqua(`  textLog 字段包含完整的文本格式日志`));
-                    
-                    console.info(`[${SCRIPT_NAME}] 日志已保存: ${LOG_DIR}/${jsonFilename}`);
-                    
-                    // 控制台只输出简要统计
-                    console.info(`[${SCRIPT_NAME}] ========== 清理日志已生成 ==========`);
-                    console.info(`[${SCRIPT_NAME}] 文件: ${LOG_DIR}/${jsonFilename}`);
-                    console.info(`[${SCRIPT_NAME}] 清理物品: ${clearData.itemCount} 个 | 经验球: ${clearData.orbCount} 个`);
-                    console.info(`[${SCRIPT_NAME}] 物品种类: ${sortedItems.length} 种`);
-                    console.info(`[${SCRIPT_NAME}] 前5种物品: ${sortedItems.slice(0, 5).map(([id, stats]) => `${id}(x${stats.totalCount})`).join(', ')}`);
-                    console.info(`[${SCRIPT_NAME}] =====================================`);
-                    
-                } catch (e1) {
-                    throw e1;
                 }
                 
-            } catch (error) {
-                // 如果文件写入失败，保存到内存
-                global.lastClearLog = {
-                    filename: filename,
-                    content: logContent.join('\n'),
-                    lines: logContent,
+                // 构建 JSON 日志对象
+                let jsonLog = {
+                    version: SCRIPT_VERSION,
                     timestamp: clearData.timestamp,
-                    itemCount: clearData.itemCount,
-                    orbCount: clearData.orbCount
-                };
+                    timestampStr: timestamp.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'}),
+                    operator: player.username,
+                    summary: {
+                        itemCount: clearData.itemCount,
+                        orbCount: clearData.orbCount,
+                        itemTypes: sortedItems.length
+                    },
+                    items: sortedItems.map(([id, stats]) => ({
+                        id: id,
+                        displayName: stats.displayName,
+                        totalCount: stats.totalCount,
+                        locationCount: stats.locations.length,
+                        locations: stats.locations
+                    })),
+                    textLog: logContent
+                }
                 
-                console.warn(`[${SCRIPT_NAME}] 文件写入失败: ${error}`);
-                console.info(`[${SCRIPT_NAME}] ========== 清理统计（文件写入失败）==========`);
-                console.info(`[${SCRIPT_NAME}] 清理物品: ${clearData.itemCount} 个 | 经验球: ${clearData.orbCount} 个`);
-                console.info(`[${SCRIPT_NAME}] 物品种类: ${sortedItems.length} 种`);
-                console.info(`[${SCRIPT_NAME}] 前5种物品: ${sortedItems.slice(0, 5).map(([id, stats]) => `${id}(x${stats.totalCount})`).join(', ')}`);
-                console.info(`[${SCRIPT_NAME}] =====================================`);
+                // 使用 JsonIO 写入 JSON 文件
+                let jsonFilename = filename.replace('.txt', '.json')
+                JsonIO.write(`${LOG_DIR}/${jsonFilename}`, jsonLog)
                 
-                player.tell(Text.red(`[错误] 文件写入失败: ${error}`));
-                player.tell(Text.yellow(`  请检查服务器是否有写入权限`));
+                // 记录已生成的日志，防止重复生成
+                data.putLong('lastGeneratedLogTimestamp', clearData.timestamp)
+                data.putString('lastGeneratedLogFilename', jsonFilename)
+                
+                player.tell(Text.green(`[成功] 日志文件已生成！`))
+                player.tell(Text.gray(`  路径: ${LOG_DIR}/${jsonFilename}`))
+                player.tell(Text.gray(`  共记录 ${clearData.itemCount} 个物品，${sortedItems.length} 种类型`))
+                player.tell(Text.yellow(`  提示: JSON 格式，可用文本编辑器查看`))
+                player.tell(Text.aqua(`  textLog 字段包含完整的文本格式日志`))
+                
+                console.info(`[${SCRIPT_NAME}] 日志已保存: ${LOG_DIR}/${jsonFilename}`)
+                
+                // 控制台只输出简要统计
+                console.info(`[${SCRIPT_NAME}] ========== 清理日志已生成 ==========`)
+                console.info(`[${SCRIPT_NAME}] 文件: ${LOG_DIR}/${jsonFilename}`)
+                console.info(`[${SCRIPT_NAME}] 清理物品: ${clearData.itemCount} 个 | 经验球: ${clearData.orbCount} 个`)
+                console.info(`[${SCRIPT_NAME}] 物品种类: ${sortedItems.length} 种`)
+                console.info(`[${SCRIPT_NAME}] 前5种物品: ${sortedItems.slice(0, 5).map(([id, stats]) => `${id}(x${stats.totalCount})`).join(', ')}`)
+                console.info(`[${SCRIPT_NAME}] =====================================`)
+                
+            } catch (e1) {
+                throw e1
             }
             
         } catch (error) {
-            player.tell(Text.red(`[错误] 生成日志失败: ${error}`));
-            console.error(`[${SCRIPT_NAME}] Generate log error: ${error}`);
+            // 如果文件写入失败，保存到内存
+            global.lastClearLog = {
+                filename: filename,
+                content: logContent.join('\n'),
+                lines: logContent,
+                timestamp: clearData.timestamp,
+                itemCount: clearData.itemCount,
+                orbCount: clearData.orbCount
+            }
+            
+            console.warn(`[${SCRIPT_NAME}] 文件写入失败: ${error}`)
+            console.info(`[${SCRIPT_NAME}] ========== 清理统计（文件写入失败）==========`)
+            console.info(`[${SCRIPT_NAME}] 清理物品: ${clearData.itemCount} 个 | 经验球: ${clearData.orbCount} 个`)
+            console.info(`[${SCRIPT_NAME}] 物品种类: ${sortedItems.length} 种`)
+            console.info(`[${SCRIPT_NAME}] 前5种物品: ${sortedItems.slice(0, 5).map(([id, stats]) => `${id}(x${stats.totalCount})`).join(', ')}`)
+            console.info(`[${SCRIPT_NAME}] =====================================`)
+            
+            player.tell(Text.red(`[错误] 文件写入失败: ${error}`))
+            player.tell(Text.yellow(`  请检查服务器是否有写入权限`))
         }
+        
+    } catch (error) {
+        player.tell(Text.red(`[错误] 生成日志失败: ${error}`))
+        console.error(`[${SCRIPT_NAME}] Generate log error: ${error}`)
     }
-});
+})

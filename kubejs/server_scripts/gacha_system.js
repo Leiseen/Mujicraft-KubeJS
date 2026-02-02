@@ -243,85 +243,94 @@ function showGachaResult(player, rarity, reward) {
 // ═══════════════════════════════════════════════════════════
 
 ItemEvents.rightClicked(event => {
-    let player = event.player;
-    let item = event.item;
+    let player = event.player
+    let item = event.item
 
-    if (!item.nbt || !item.nbt.gacha_ticket) return;
+    // 安全检查：确保物品和 NBT 存在
+    if (!item || !item.nbt) return
+    if (!item.nbt.gacha_ticket) return
 
-    let gachaType = item.nbt.gacha_type;
+    let gachaType = item.nbt.gacha_type
 
     // 单抽券
     if (gachaType === 'normal' || gachaType === 'advanced' || gachaType === 'legendary') {
-        let result = performGacha(player, gachaType);
+        let result = performGacha(player, gachaType)
         if (result) {
-            giveReward(player, result.reward);
-            showGachaResult(player, result.rarity, result.reward);
-            item.count--;
+            giveReward(player, result.reward)
+            showGachaResult(player, result.rarity, result.reward)
+            item.count--
         }
     }
     // 十连券
     else if (gachaType === 'normal_10' || gachaType === 'advanced_10' || gachaType === 'legendary_10') {
-        let baseType = gachaType.replace('_10', '');
-        let results = perform10Gacha(player, baseType);
+        let baseType = gachaType.replace('_10', '')
+        let results = perform10Gacha(player, baseType)
 
-        if (results.length === 0) return;
+        if (!results || results.length === 0) return
 
-        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-        player.tell(Text.yellow('✦ 十连抽卡结果 ✦').bold(true));
-        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
+        player.tell(Text.yellow('✦ 十连抽卡结果 ✦').bold(true))
+        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
 
-        let counts = { N: 0, R: 0, SR: 0, SSR: 0 };
+        let counts = { N: 0, R: 0, SR: 0, SSR: 0 }
 
         results.forEach(function (r, i) {
-            giveReward(player, r.reward);
-            counts[r.rarity]++;
+            giveReward(player, r.reward)
+            counts[r.rarity]++
 
-            let txt = Text.of((i + 1) + '. ');
+            let txt = Text.of((i + 1) + '. ')
             if (r.rarity === 'SSR') {
-                txt = txt.append(Text.gold('[SSR] ' + r.reward.name));
+                txt = txt.append(Text.gold('[SSR] ' + r.reward.name))
             } else if (r.rarity === 'SR') {
-                txt = txt.append(Text.lightPurple('[SR] ' + r.reward.name));
+                txt = txt.append(Text.lightPurple('[SR] ' + r.reward.name))
             } else if (r.rarity === 'R') {
-                txt = txt.append(Text.blue('[R] ' + r.reward.name));
+                txt = txt.append(Text.blue('[R] ' + r.reward.name))
             } else {
-                txt = txt.append(Text.white('[N] ' + r.reward.name));
+                txt = txt.append(Text.white('[N] ' + r.reward.name))
             }
-            player.tell(txt);
-        });
+            player.tell(txt)
+        })
 
-        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-        let stats = Text.gray('统计：');
-        stats = stats.append(Text.white(counts.N + 'N '));
-        stats = stats.append(Text.blue(counts.R + 'R '));
-        stats = stats.append(Text.lightPurple(counts.SR + 'SR '));
-        stats = stats.append(Text.gold(counts.SSR + 'SSR'));
-        player.tell(stats);
-        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
+        let stats = Text.gray('统计：')
+        stats = stats.append(Text.white(counts.N + 'N '))
+        stats = stats.append(Text.blue(counts.R + 'R '))
+        stats = stats.append(Text.lightPurple(counts.SR + 'SR '))
+        stats = stats.append(Text.gold(counts.SSR + 'SSR'))
+        player.tell(stats)
+        player.tell(Text.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
 
         if (counts.SSR > 0) {
-            player.tell(Text.gold('★★★ 传说降临！★★★').bold(true));
-            player.runCommandSilent('playsound minecraft:ui.toast.challenge_complete player @s ~ ~ ~ 1 1');
-            player.runCommandSilent('particle minecraft:totem_of_undying ~ ~1 ~ 0.5 0.5 0.5 0.1 100');
+            player.tell(Text.gold('★★★ 传说降临！★★★').bold(true))
+            player.runCommandSilent('playsound minecraft:ui.toast.challenge_complete player @s ~ ~ ~ 1 1')
+            player.runCommandSilent('particle minecraft:totem_of_undying ~ ~1 ~ 0.5 0.5 0.5 0.1 100')
         } else if (counts.SR > 0) {
-            player.runCommandSilent('playsound minecraft:entity.player.levelup player @s ~ ~ ~ 1 1.5');
-            player.runCommandSilent('particle minecraft:enchant ~ ~1 ~ 0.5 0.5 0.5 0.1 50');
+            player.runCommandSilent('playsound minecraft:entity.player.levelup player @s ~ ~ ~ 1 1.5')
+            player.runCommandSilent('particle minecraft:enchant ~ ~1 ~ 0.5 0.5 0.5 0.1 50')
         }
 
-        item.count--;
+        item.count--
     }
-});
+})
 
 // ═══════════════════════════════════════════════════════════
 // 重载配置命令
 // ═══════════════════════════════════════════════════════════
 
-ServerEvents.customCommand('gacha_reload', event => {
-    configLoaded = false;
-    loadConfig();
-    event.player.tell(Text.green('[抽卡系统] 配置已重载！'));
-});
+// 注意：KubeJS 6 中 ServerEvents.customCommand 的正确语法
+// 第一个参数是命令 ID，回调函数中 event 包含 player 和 server
+ServerEvents.customCommand(event => {
+    // 检查命令 ID
+    if (event.id === 'gacha_reload') {
+        configLoaded = false
+        loadConfig()
+        if (event.player) {
+            event.player.tell(Text.green('[抽卡系统] 配置已重载！'))
+        }
+    }
+})
 
 // ═══════════════════════════════════════════════════════════
-console.info('[抽卡系统] Gacha System v2.2 已加载！');
-console.info('[抽卡系统] 配置文件位置：kubejs/config/');
-console.info('[抽卡系统] 重载命令：/kubejs custom_command gacha_reload');
+console.info('[抽卡系统] Gacha System v2.3 已加载！')
+console.info('[抽卡系统] 配置文件位置：kubejs/config/')
+console.info('[抽卡系统] 重载命令：/kubejs custom_command gacha_reload')
