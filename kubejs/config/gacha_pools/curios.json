@@ -1,0 +1,569 @@
+{
+    "_comment": "饰品寻访 - Artifacts & Terra Curio 专属池",
+    "_bannerName": "饰品寻访",
+    "tickets": {
+        "single": {
+            "type": "curio",
+            "name": "【饰品】寻访凭证",
+            "color": "aqua",
+            "lore": [
+                {
+                    "text": "=== 饰品寻访 ===",
+                    "color": "aqua"
+                },
+                {
+                    "text": "【SSR 10%】共15种",
+                    "color": "gold"
+                },
+                {
+                    "text": "水晶之心/机械手套/终极吊坠/紫颂图腾",
+                    "color": "gold"
+                },
+                {
+                    "text": "金钩/隐身围巾/饮料帽",
+                    "color": "gold"
+                },
+                {
+                    "text": "恶魔之心/重力球/圣骑士之盾/金属探测器",
+                    "color": "gold"
+                },
+                {
+                    "text": "探险家装备/血肉指节/钴蓝盾牌/魔镜",
+                    "color": "gold"
+                },
+                {
+                    "text": "【SR 30%】共30种",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "夜视镜/十字项链/火焰吊坠/电击吊坠/荆棘吊坠",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "野性之爪/火焰手套/力量手套/挖掘之爪/吸血手套",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "云瓶/兔子跳鞋/猫咪拖鞋/水上冲刺鞋",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "黑曜石骷髅/解毒容器/万能吸铁石/镐加热器",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "魔法箭袋/游骑兵徽章/再生手环/熔岩护符",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "太阳石/月亮石/幸运马蹄/鲨鱼牙项链",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "野性之爪(泰拉)/黑腰带/混乱之脑/眼罩",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "【R 60%】共25种",
+                    "color": "blue"
+                },
+                {
+                    "text": "幸运围巾/洋葱圈/袖珍活塞/放屁坐垫/通气管",
+                    "color": "blue"
+                },
+                {
+                    "text": "脚蹼/跑步鞋/雪鞋/氦气火烈鸟/雨伞",
+                    "color": "blue"
+                },
+                {
+                    "text": "钓鱼帽/牛仔帽/迷信帽/村民帽/稳固钉鞋/生根靴",
+                    "color": "blue"
+                },
+                {
+                    "text": "雷达/指南针饰品/深度计/DPS计量器/计数器",
+                    "color": "blue"
+                },
+                {
+                    "text": "爱马仕之靴/鞋带扣/花之靴/枷锁",
+                    "color": "blue"
+                },
+                {
+                    "text": "来自 Artifacts & Terra Curio!",
+                    "color": "yellow"
+                }
+            ],
+            "price": {
+                "item": "minecraft:diamond",
+                "count": 2
+            }
+        },
+        "multi": {
+            "type": "curio_10",
+            "name": "【饰品】十连礼盒",
+            "color": "aqua",
+            "bold": true,
+            "lore": [
+                {
+                    "text": "=== 饰品寻访 十连 ===",
+                    "color": "aqua"
+                },
+                {
+                    "text": "保底: 至少1个SR + 1个SSR",
+                    "color": "yellow"
+                },
+                {
+                    "text": "【SSR 10%】共15种",
+                    "color": "gold"
+                },
+                {
+                    "text": "水晶之心/机械手套/终极吊坠/紫颂图腾",
+                    "color": "gold"
+                },
+                {
+                    "text": "金钩/隐身围巾/饮料帽",
+                    "color": "gold"
+                },
+                {
+                    "text": "恶魔之心/重力球/圣骑士之盾/金属探测器",
+                    "color": "gold"
+                },
+                {
+                    "text": "探险家装备/血肉指节/钴蓝盾牌/魔镜",
+                    "color": "gold"
+                },
+                {
+                    "text": "【SR 30%】共30种",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "夜视镜/十字项链/火焰吊坠/电击吊坠/荆棘吊坠",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "野性之爪/火焰手套/力量手套/挖掘之爪/吸血手套",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "云瓶/兔子跳鞋/猫咪拖鞋/水上冲刺鞋",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "黑曜石骷髅/解毒容器/万能吸铁石/镐加热器",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "魔法箭袋/游骑兵徽章/再生手环/熔岩护符",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "太阳石/月亮石/幸运马蹄/鲨鱼牙项链",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "野性之爪(泰拉)/黑腰带/混乱之脑/眼罩",
+                    "color": "light_purple"
+                },
+                {
+                    "text": "【R 60%】共25种",
+                    "color": "blue"
+                },
+                {
+                    "text": "幸运围巾/洋葱圈/袖珍活塞/放屁坐垫/通气管",
+                    "color": "blue"
+                },
+                {
+                    "text": "脚蹼/跑步鞋/雪鞋/氦气火烈鸟/雨伞",
+                    "color": "blue"
+                },
+                {
+                    "text": "钓鱼帽/牛仔帽/迷信帽/村民帽/稳固钉鞋/生根靴",
+                    "color": "blue"
+                },
+                {
+                    "text": "雷达/指南针饰品/深度计/DPS计量器/计数器",
+                    "color": "blue"
+                },
+                {
+                    "text": "爱马仕之靴/鞋带扣/花之靴/枷锁",
+                    "color": "blue"
+                },
+                {
+                    "text": "9折优惠: 18钻石",
+                    "color": "gold"
+                }
+            ],
+            "price": {
+                "item": "minecraft:diamond",
+                "count": 18
+            }
+        }
+    },
+    "rates": {
+        "R": 60,
+        "SR": 30,
+        "SSR": 10
+    },
+    "guarantees": {
+        "minRarity": "SR",
+        "minSSR": 1,
+        "minSR": 1
+    },
+    "pools": {
+        "R": [
+            {
+                "item": "artifacts:lucky_scarf",
+                "count": 1,
+                "name": "幸运围巾"
+            },
+            {
+                "item": "artifacts:onion_ring",
+                "count": 1,
+                "name": "洋葱圈"
+            },
+            {
+                "item": "artifacts:pocket_piston",
+                "count": 1,
+                "name": "袖珍活塞"
+            },
+            {
+                "item": "artifacts:whoopee_cushion",
+                "count": 1,
+                "name": "放屁坐垫"
+            },
+            {
+                "item": "artifacts:snorkel",
+                "count": 1,
+                "name": "通气管"
+            },
+            {
+                "item": "artifacts:flippers",
+                "count": 1,
+                "name": "脚蹼"
+            },
+            {
+                "item": "artifacts:running_shoes",
+                "count": 1,
+                "name": "跑步鞋"
+            },
+            {
+                "item": "artifacts:snowshoes",
+                "count": 1,
+                "name": "雪鞋"
+            },
+            {
+                "item": "artifacts:helium_flamingo",
+                "count": 1,
+                "name": "氦气火烈鸟"
+            },
+            {
+                "item": "artifacts:umbrella",
+                "count": 1,
+                "name": "雨伞"
+            },
+            {
+                "item": "artifacts:anglers_hat",
+                "count": 1,
+                "name": "钓鱼帽"
+            },
+            {
+                "item": "artifacts:cowboy_hat",
+                "count": 1,
+                "name": "牛仔帽"
+            },
+            {
+                "item": "artifacts:superstitious_hat",
+                "count": 1,
+                "name": "迷信帽"
+            },
+            {
+                "item": "artifacts:villager_hat",
+                "count": 1,
+                "name": "村民帽"
+            },
+            {
+                "item": "artifacts:steadfast_spikes",
+                "count": 1,
+                "name": "稳固钉鞋"
+            },
+            {
+                "item": "artifacts:rooted_boots",
+                "count": 1,
+                "name": "生根靴"
+            },
+            {
+                "item": "terra_curio:radar",
+                "count": 1,
+                "name": "雷达"
+            },
+            {
+                "item": "terra_curio:compass",
+                "count": 1,
+                "name": "指南针饰品"
+            },
+            {
+                "item": "terra_curio:depth_meter",
+                "count": 1,
+                "name": "深度计"
+            },
+            {
+                "item": "terra_curio:dps_meter",
+                "count": 1,
+                "name": "DPS计量器"
+            },
+            {
+                "item": "terra_curio:tally_counter",
+                "count": 1,
+                "name": "计数器"
+            },
+            {
+                "item": "terra_curio:hermes_boots",
+                "count": 1,
+                "name": "爱马仕之靴"
+            },
+            {
+                "item": "terra_curio:aglet",
+                "count": 1,
+                "name": "鞋带扣"
+            },
+            {
+                "item": "terra_curio:flower_boots",
+                "count": 1,
+                "name": "花之靴"
+            },
+            {
+                "item": "terra_curio:shackle",
+                "count": 1,
+                "name": "枷锁"
+            }
+        ],
+        "SR": [
+            {
+                "item": "artifacts:night_vision_goggles",
+                "count": 1,
+                "name": "夜视镜"
+            },
+            {
+                "item": "artifacts:cross_necklace",
+                "count": 1,
+                "name": "十字项链"
+            },
+            {
+                "item": "artifacts:flame_pendant",
+                "count": 1,
+                "name": "火焰吊坠"
+            },
+            {
+                "item": "artifacts:shock_pendant",
+                "count": 1,
+                "name": "电击吊坠"
+            },
+            {
+                "item": "artifacts:thorn_pendant",
+                "count": 1,
+                "name": "荆棘吊坠"
+            },
+            {
+                "item": "artifacts:feral_claws",
+                "count": 1,
+                "name": "野性之爪"
+            },
+            {
+                "item": "artifacts:fire_gauntlet",
+                "count": 1,
+                "name": "火焰手套"
+            },
+            {
+                "item": "artifacts:power_glove",
+                "count": 1,
+                "name": "力量手套"
+            },
+            {
+                "item": "artifacts:digging_claws",
+                "count": 1,
+                "name": "挖掘之爪"
+            },
+            {
+                "item": "artifacts:vampiric_glove",
+                "count": 1,
+                "name": "吸血手套"
+            },
+            {
+                "item": "artifacts:cloud_in_a_bottle",
+                "count": 1,
+                "name": "云瓶"
+            },
+            {
+                "item": "artifacts:bunny_hoppers",
+                "count": 1,
+                "name": "兔子跳鞋"
+            },
+            {
+                "item": "artifacts:kitty_slippers",
+                "count": 1,
+                "name": "猫咪拖鞋"
+            },
+            {
+                "item": "artifacts:aqua_dashers",
+                "count": 1,
+                "name": "水上冲刺鞋"
+            },
+            {
+                "item": "artifacts:obsidian_skull",
+                "count": 1,
+                "name": "黑曜石骷髅"
+            },
+            {
+                "item": "artifacts:antidote_vessel",
+                "count": 1,
+                "name": "解毒容器"
+            },
+            {
+                "item": "artifacts:universal_attractor",
+                "count": 1,
+                "name": "万能吸铁石"
+            },
+            {
+                "item": "artifacts:pickaxe_heater",
+                "count": 1,
+                "name": "镐加热器"
+            },
+            {
+                "item": "terra_curio:magic_quiver",
+                "count": 1,
+                "name": "魔法箭袋"
+            },
+            {
+                "item": "terra_curio:ranger_emblem",
+                "count": 1,
+                "name": "游骑兵徽章"
+            },
+            {
+                "item": "terra_curio:band_of_regeneration",
+                "count": 1,
+                "name": "再生手环"
+            },
+            {
+                "item": "terra_curio:lava_charm",
+                "count": 1,
+                "name": "熔岩护符"
+            },
+            {
+                "item": "terra_curio:sun_stone",
+                "count": 1,
+                "name": "太阳石"
+            },
+            {
+                "item": "terra_curio:moon_stone",
+                "count": 1,
+                "name": "月亮石"
+            },
+            {
+                "item": "terra_curio:lucky_horseshoe",
+                "count": 1,
+                "name": "幸运马蹄"
+            },
+            {
+                "item": "terra_curio:shark_tooth_necklace",
+                "count": 1,
+                "name": "鲨鱼牙项链"
+            },
+            {
+                "item": "terra_curio:feral_claws",
+                "count": 1,
+                "name": "野性之爪(泰拉)"
+            },
+            {
+                "item": "terra_curio:black_belt",
+                "count": 1,
+                "name": "黑腰带"
+            },
+            {
+                "item": "terra_curio:brain_of_confusion",
+                "count": 1,
+                "name": "混乱之脑"
+            },
+            {
+                "item": "terra_curio:blindfold",
+                "count": 1,
+                "name": "眼罩"
+            }
+        ],
+        "SSR": [
+            {
+                "item": "artifacts:crystal_heart",
+                "count": 1,
+                "name": "水晶之心"
+            },
+            {
+                "item": "artifacts:mechanical_glove",
+                "count": 1,
+                "name": "机械手套"
+            },
+            {
+                "item": "artifacts:ultimate_pendant",
+                "count": 1,
+                "name": "终极吊坠"
+            },
+            {
+                "item": "artifacts:chorus_totem",
+                "count": 1,
+                "name": "紫颂图腾"
+            },
+            {
+                "item": "artifacts:golden_hook",
+                "count": 1,
+                "name": "金钩"
+            },
+            {
+                "item": "artifacts:scarf_of_invisibility",
+                "count": 1,
+                "name": "隐身围巾"
+            },
+            {
+                "item": "artifacts:drinking_hat",
+                "count": 1,
+                "name": "饮料帽"
+            },
+            {
+                "item": "terra_curio:demon_heart",
+                "count": 1,
+                "name": "恶魔之心"
+            },
+            {
+                "item": "terra_curio:gravity_globe",
+                "count": 1,
+                "name": "重力球"
+            },
+            {
+                "item": "terra_curio:paladins_shield",
+                "count": 1,
+                "name": "圣骑士之盾"
+            },
+            {
+                "item": "terra_curio:metal_detector",
+                "count": 1,
+                "name": "金属探测器"
+            },
+            {
+                "item": "terra_curio:explorers_equipment",
+                "count": 1,
+                "name": "探险家装备"
+            },
+            {
+                "item": "terra_curio:flesh_knuckles",
+                "count": 1,
+                "name": "血肉指节"
+            },
+            {
+                "item": "terra_curio:cobalt_shield",
+                "count": 1,
+                "name": "钴蓝盾牌"
+            },
+            {
+                "item": "terra_curio:magic_mirror",
+                "count": 1,
+                "name": "魔镜"
+            }
+        ]
+    }
+}

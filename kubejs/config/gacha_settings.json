@@ -15,6 +15,7 @@
     "banners": [
         "functional",
         "orbs",
+        "curios",
         "chaos"
     ],
     "rarityColors": {
